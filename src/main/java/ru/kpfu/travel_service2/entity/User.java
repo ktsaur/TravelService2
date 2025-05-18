@@ -26,7 +26,7 @@ public class User {
     private List<Travel> travels;
 
     @Column
-    private boolean enabled = false;
+    private Boolean enabled = false;
 
     @Column
     private String activationToken;
