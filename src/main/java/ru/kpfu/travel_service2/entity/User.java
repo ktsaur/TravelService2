@@ -33,6 +33,9 @@ public class User {
     @Column
     private Boolean activated;
 
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
+
     @ManyToMany
     @JoinTable(
             name = "favourites",
@@ -40,5 +43,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "article_id")
     )
     private List<Article> favouriteArticles;
+
+    public enum Role {
+        USER, ADMIN
+    }
+
 
 }

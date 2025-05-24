@@ -1,9 +1,10 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <title>Вход</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .login-form {
             max-width: 400px;
@@ -13,33 +14,34 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .form-group {
             margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="login-form">
         <h2>Вход</h2>
-
-        <#if param?? && param.error??>
+        <#if message??>
             <div class="alert alert-danger" role="alert">
-                Неверное имя пользователя или пароль
+                ${message}
             </div>
         </#if>
-
-        <#if param?? && param.logout??>
-            <div class="alert alert-success" role="alert">
-                Вы успешно вышли
-            </div>
+        <#if result?? && result.hasErrors()>
+            <#list result.fieldErrors as error>
+                <div class="alert alert-danger" role="alert">
+                    ${error.defaultMessage}
+                </div>
+            </#list>
         </#if>
-
         <form action="/login" method="post">
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                <input type="text" class="form-control" id="username" name="username"
+                       value="${(userLoginDto.username)!''}"
+                       required>
             </div>
             <div class="form-group">
                 <label for="password">Пароль:</label>
@@ -47,10 +49,9 @@
             </div>
             <button type="submit" class="btn btn-primary">Войти</button>
         </form>
-
-    <p class="mt-3 text-center">Нет аккаунта? <a href="/registration">Зарегистрироваться</a></p>
+        <p class="mt-3 text-center">Нет аккаунта? <a href="/registration">Зарегистрироваться</a></p>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
