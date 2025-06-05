@@ -6,30 +6,32 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/registration", "/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/registration", "/login", "/home", "/css/**", "/js/**", "/article/detail/**").permitAll()
+                        .requestMatchers("/create/article", "/travels", "/create/travel", "/travel/**", "/profile", "/profile/update", "/profile/delete", "/update/password", "/article/toggle-favourite/**", "/favourites").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // путь к GET login
-                        .loginProcessingUrl("/login") // путь, куда отправляется POST
-                        .defaultSuccessUrl("/activation", true) // путь после успешного входа
-                        .failureUrl("/login?error=true") // путь при ошибке входа
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/home")
                         .permitAll()
                 );

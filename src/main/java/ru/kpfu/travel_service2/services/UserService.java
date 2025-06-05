@@ -68,4 +68,15 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void deleteUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        userRepository.delete(user);
+    }
+
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }

@@ -1,8 +1,8 @@
 package ru.kpfu.travel_service2.utils;
 
 public class FavouriteActionResult {
-    private boolean success; // Удалось ли выполнить действие
-    private boolean isFavourite; // Новый статус избранного
+    private boolean success;
+    private boolean isFavourite;
 
     public FavouriteActionResult(boolean success, boolean isFavourite) {
         this.success = success;
@@ -13,7 +13,15 @@ public class FavouriteActionResult {
         return success;
     }
 
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
     public boolean isFavourite() {
         return isFavourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
     }
 }
