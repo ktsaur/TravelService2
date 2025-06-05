@@ -4,211 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .article-card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        body {
+            background-color: #f8f9fa;
         }
-        .article-title {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .article-meta {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        .article-content {
-            color: #444;
-            margin-bottom: 15px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .auth-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
-        }
-        .auth-button:hover {
-            background-color: #0056b3;
-        }
-        .create-article-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .create-article-button:hover {
-            background-color: #218838;
-        }
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .article-list {
-            list-style: none;
-            padding: 0;
-        }
-        .article-item {
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            position: relative;
-        }
-        .favourite-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #dc3545;
+        .nav-pills .nav-link {
+            color: #495057;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
             transition: all 0.3s ease;
         }
-        .favourite-icon:hover {
-            transform: scale(1.1);
+        .nav-pills .nav-link:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
         }
-        .article-link {
-            color: #333;
-            text-decoration: none;
-            transition: color 0.3s ease;
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
         }
-        .article-link:hover {
-            color: #007bff;
+        .article-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        .scrollspy-example-2 {
+            height: calc(100vh - 250px);
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        .scrollspy-example-2::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollspy-example-2::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .scrollspy-example-2::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        .create-article-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        .favorite-btn {
+            transition: transform 0.3s ease;
+        }
+        .favorite-btn:hover {
+            transform: scale(1.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Добро пожаловать!</h2>
-            <div class="auth-buttons">
-                <#if user??>
-                    <a href="/travels" class="auth-button">Мои путешествия</a>
-                    <a href="/favourites" class="auth-button">Избранные статьи</a>
-                    <a href="/profile" class="auth-button">Профиль</a>
-                    <form action="/logout" method="post" style="margin: 0;">
-                        <button type="submit" class="auth-button">Выйти</button>
-                    </form>
-                <#else>
-                    <a href="/login" class="auth-button">Войти</a>
-                    <a href="/registration" class="auth-button">Зарегистрироваться</a>
-                </#if>
+    <#include "header.ftlh">
+
+    <div class="container-fluid py-5">
+        <#if message??>
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        </div>
-
-        <div id="alert" class="alert alert-error" style="display: none;"></div>
-
-        <#if error??>
-            <div class="alert alert-error">${error}</div>
-        </#if>
-        <#if success??>
-            <div class="alert alert-success">${success}</div>
         </#if>
 
-        <#if user??>
-            <a href="/create/article" class="create-article-button">Создать статью</a>
+        <#if groupedArticles?? && groupedArticles?size == 0>
+            <div class="text-center py-5">
+                <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                <h3 class="text-muted">Статей пока нет</h3>
+                <p class="text-muted">Будьте первым, кто создаст статью!</p>
+            </div>
         </#if>
 
-        <h3>Статьи о путешествиях:</h3>
-        
-        <#if articles?? && articles?size gt 0>
-            <div class="article-list">
-                <#list articles as article>
-                    <div class="article-item">
-                        <h3 class="article-title">
-                            <a href="/article/detail/${article.articleId}" class="article-link">${article.title}</a>
-                        </h3>
-                        <div class="article-meta">
-                            Категория: ${(article.category)!'Без категории'}
-                        </div>
-                        <i class="favourite-icon <#if favouriteArticles?? && favouriteArticles?seq_contains(article)>fas fa-heart<#else>far fa-heart</#if>"
-                           data-article-id="${article.articleId}"
-                           onclick="<#if user??>toggleFavourite(this, ${article.articleId})<#else>showAuthAlert()</#if>"></i>
+        <#if groupedArticles?? && groupedArticles?size gt 0>
+            <div class="row">
+                <!-- Sidebar Navigation -->
+                <div class="col-lg-3 col-md-4">
+                    <div class="position-sticky" style="top: 2rem;">
+                        <nav id="navbar-example3" class="navbar navbar-light bg-white rounded-3 shadow-sm p-3">
+                            <nav class="nav nav-pills flex-column w-100">
+                                <#list groupedArticles?keys as category>
+                                    <div class="mb-3">
+                                        <a class="nav-link fw-bold" href="#category-${category}">
+                                            <i class="bi bi-bookmark-fill me-2"></i>${category}
+                                        </a>
+                                        <nav class="nav nav-pills flex-column ms-3">
+                                            <#list groupedArticles[category] as article>
+                                                <a class="nav-link small" href="#article-${article.articleId}">
+                                                    ${article.title}
+                                                </a>
+                                            </#list>
+                                        </nav>
+                                    </div>
+                                </#list>
+                            </nav>
+                        </nav>
                     </div>
-                </#list>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-9 col-md-8">
+                    <div data-bs-spy="scroll" data-bs-target="#navbar-example3" data-bs-smooth-scroll="true" 
+                         class="scrollspy-example-2" tabindex="0">
+                        <#list groupedArticles as category, articles>
+                            <div id="category-${category}" class="mb-5">
+                                <h3 class="border-bottom pb-2 mb-4">
+                                    <i class="bi bi-collection me-2"></i>${category}
+                                </h3>
+                                <div class="row g-4">
+                                    <#list articles as article>
+                                        <div class="col-12" id="article-${article.articleId}">
+                                            <div class="card article-card border-0 shadow-sm">
+                                                <div class="card-body">
+                                                    <h4 class="card-title mb-3">${article.title}</h4>
+                                                    <p class="card-text text-muted">
+                                                        <#if article.content??>
+                                                            <#if article.content?length gt 200>
+                                                                ${article.content[0..199]}...
+                                                            <#else>
+                                                                ${article.content}
+                                                            </#if>
+                                                        </#if>
+                                                    </p>
+                                                    <div class="d-flex align-items-center justify-content-between mt-3">
+                                                        <a href="/article/${article.articleId}" class="btn btn-primary">
+                                                            <i class="bi bi-book me-2"></i>Читать полностью
+                                                        </a>
+                                                        <#if user??>
+                                                            <form action="/home" method="post" class="d-inline">
+                                                                <#if _csrf??>
+                                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                                                </#if>
+                                                                <input type="hidden" name="action" value="toggleFavourite"/>
+                                                                <input type="hidden" name="articleId" value="${article.articleId}"/>
+                                                                <button type="submit" class="btn btn-link favorite-btn p-0">
+                                                                    <#if favouriteStatus[article.articleId?string]?? && favouriteStatus[article.articleId?string]>
+                                                                        <i class="bi bi-heart-fill text-danger fs-4"></i>
+                                                                    <#else>
+                                                                        <i class="bi bi-heart text-danger fs-4"></i>
+                                                                    </#if>
+                                                                </button>
+                                                            </form>
+                                                        </#if>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </#list>
+                                </div>
+                            </div>
+                        </#list>
+                    </div>
+                </div>
             </div>
-        <#else>
-            <p>На данный момент статей нет.</p>
         </#if>
+
+        <a href="/create/article" class="btn btn-primary create-article-btn">
+            <i class="bi bi-plus-circle-fill me-2"></i>Создать статью
+        </a>
     </div>
 
-    <script>
-        function showAuthAlert() {
-            showAlert('Чтобы добавить статью в избранное, необходимо авторизоваться');
-        }
+    <#include "footer.ftlh">
 
-        function showAlert(message) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-
-        function toggleFavourite(icon, articleId) {
-            fetch('/article/toggle-favourite/' + articleId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (data.isAdded) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                    }
-                } else {
-                    showAlert(data.message);
-                }
-            })
-            .catch(error => {
-                showAlert('Произошла ошибка при обновлении избранного');
-            });
-        }
-    </script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

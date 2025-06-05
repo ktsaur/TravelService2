@@ -3,148 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Детали статьи</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>${article.title} - Детали статьи</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .container {
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .article-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
         }
         .article-header {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            position: relative;
         }
         .article-title {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #212529;
+            margin-bottom: 1rem;
         }
         .article-meta {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
+            color: #6c757d;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
         .article-content {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #444;
-            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #495057;
+            margin-bottom: 2rem;
+            white-space: pre-wrap;
         }
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 20px;
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .back-button:hover {
-            background-color: #0056b3;
+        .favorite-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            transition: transform 0.3s ease;
         }
-        .favourite-icon {
-            font-size: 24px;
-            cursor: pointer;
-            color: #dc3545;
-            margin-left: 10px;
-            transition: all 0.3s ease;
+        .favorite-btn:hover {
+            transform: scale(1.2);
         }
-        .favourite-icon:hover {
-            transform: scale(1.1);
+        .category-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1050;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Детали статьи</h2>
-            <div class="auth-buttons">
-                <a href="/home" class="auth-button">На главную</a>
+    <#include "header.ftlh">
+
+    <div class="container py-4">
+        <div class="article-container">
+            <!-- Навигация -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/home" class="text-decoration-none">Главная</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Статья</li>
+                </ol>
+            </nav>
+
+            <!-- Заголовок и мета-информация -->
+            <div class="article-header">
+                <h1 class="article-title">${article.title}</h1>
+                <div class="article-meta">
+                    <span class="meta-item">
+                        <i class="bi bi-calendar3"></i>
+                        ${article.createdDate?string("dd.MM.yyyy")}
+                    </span>
+                    <span class="category-badge">
+                        <i class="bi bi-bookmark-fill"></i>
+                        ${(article.category)!'Без категории'}
+                    </span>
+                    <#if user??>
+                        <form action="/home" method="post" class="d-inline ms-auto">
+                            <#if _csrf??>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </#if>
+                            <input type="hidden" name="action" value="toggleFavourite"/>
+                            <input type="hidden" name="articleId" value="${article.articleId}"/>
+                            <button type="submit" class="favorite-btn" title="Добавить в избранное">
+                                <#if favouriteStatus[article.articleId?string]?? && favouriteStatus[article.articleId?string]>
+                                    <i class="bi bi-heart-fill text-danger fs-4"></i>
+                                <#else>
+                                    <i class="bi bi-heart text-danger fs-4"></i>
+                                </#if>
+                            </button>
+                        </form>
+                    <#else>
+                        <button type="button" class="favorite-btn ms-auto" onclick="showAuthAlert()">
+                            <i class="bi bi-heart text-danger fs-4"></i>
+                        </button>
+                    </#if>
+                </div>
+            </div>
+
+            <!-- Содержание статьи -->
+            <div class="article-content">
+                ${article.content}
+            </div>
+
+            <!-- Нижняя навигация -->
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+                <a href="/home" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Назад к списку
+                </a>
                 <#if user??>
-                    <a href="/travels" class="auth-button">Мои путешествия</a>
-                    <a href="/favourites" class="auth-button">Избранные статьи</a>
-                    <a href="/profile" class="auth-button">Профиль</a>
-                    <form action="/logout" method="post" style="margin: 0;">
-                        <button type="submit" class="auth-button">Выйти</button>
-                    </form>
+                    <a href="/favourites" class="btn btn-outline-danger">
+                        <i class="bi bi-heart me-2"></i>Избранные статьи
+                    </a>
                 </#if>
             </div>
         </div>
+    </div>
 
-        <a href="/home" class="back-button">← Назад к списку статей</a>
-        
-        <div id="alert" class="alert alert-error"></div>
-
-        <div class="article-header">
-            <h1 class="article-title">
-                ${article.title}
-                <i class="favourite-icon <#if favouriteArticles?? && favouriteArticles?seq_contains(article)>fas fa-heart<#else>far fa-heart</#if>"
-                   data-article-id="${article.articleId}"
-                   onclick="<#if user??>toggleFavourite(this, ${article.articleId})<#else>showAuthAlert()</#if>"></i>
-            </h1>
-            <div class="article-meta">
-                Категория: ${(article.category)!'Без категории'}
-                <br>
-                Дата публикации: ${article.createdDate?string("dd.MM.yyyy")}
+    <!-- Тост для уведомлений -->
+    <div class="toast-container">
+        <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-        </div>
-
-        <div class="article-content">
-            ${article.content}
         </div>
     </div>
 
+    <#include "footer.ftlh">
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Функция для показа уведомления
+        function showToast(message, isError = false) {
+            const toast = document.querySelector('.toast');
+            const toastBody = toast.querySelector('.toast-body');
+            
+            toast.classList.remove('bg-primary', 'bg-danger');
+            toast.classList.add(isError ? 'bg-danger' : 'bg-primary');
+            
+            toastBody.textContent = message;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Функция для неавторизованных пользователей
         function showAuthAlert() {
-            showAlert('Чтобы добавить статью в избранное, необходимо авторизоваться');
-        }
-
-        function showAlert(message) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-
-        function toggleFavourite(icon, articleId) {
-            fetch('/article/toggle-favourite/' + articleId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (data.isAdded) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                    }
-                } else {
-                    showAlert(data.message);
-                }
-            })
-            .catch(error => {
-                showAlert('Произошла ошибка при обновлении избранного');
-            });
+            showToast('Для добавления в избранное необходимо авторизоваться', true);
         }
     </script>
 </body>

@@ -19,6 +19,7 @@ import ru.kpfu.travel_service2.services.ArticleService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ArticleController {
@@ -32,52 +33,61 @@ public class ArticleController {
     @GetMapping("/home")
     public String showHome(Model model, Authentication authentication) {
         List<Article> articles = articleService.getAllArticles();
-        model.addAttribute("articles", articles);
+        
+        // Группируем статьи по категориям
+        Map<String, List<Article>> groupedArticles = articles.stream()
+                .collect(Collectors.groupingBy(article -> 
+                    article.getCategory() != null ? article.getCategory() : "Без категории"));
+        
+        model.addAttribute("pageTitle", "TravelService");
+        model.addAttribute("groupedArticles", groupedArticles);
 
+        // Инициализируем мапу для статуса избранного
+        Map<String, Boolean> favouriteStatus = new HashMap<>();
+        
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             User user = userRepository.findByUsername(username).orElse(null);
             if (user != null) {
                 model.addAttribute("user", user);
-                model.addAttribute("favouriteArticles", user.getFavouriteArticles());
+                List<Article> favourites = user.getFavouriteArticles();
+                articles.forEach(article -> 
+                    favouriteStatus.put(article.getArticleId().toString(), favourites.contains(article)));
             }
+        } else {
+            // Для неавторизованных пользователей все статьи не в избранном
+            articles.forEach(article -> 
+                favouriteStatus.put(article.getArticleId().toString(), false));
         }
+        
+        model.addAttribute("favouriteStatus", favouriteStatus);
 
         return "home";
     }
 
-    @PostMapping("/article/toggle-favourite/{articleId}")
-    @ResponseBody
-    public ResponseEntity<?> toggleFavourite(@PathVariable Integer articleId, Authentication authentication) {
-        Map<String, Object> response = new HashMap<>();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            response.put("success", false);
-            response.put("message", "Чтобы добавить статью в избранное, сначала авторизуйтесь");
-            return ResponseEntity.ok(response);
+    @PostMapping("/home")
+    public String handleHomePost(@RequestParam("action") String action,
+                               @RequestParam("articleId") Integer articleId,
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+        if ("toggleFavourite".equals(action)) {
+            if (authentication != null && authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                User user = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                
+                boolean isAdded = articleService.toggleFavourite(user, articleId);
+                redirectAttributes.addFlashAttribute("message", 
+                    isAdded ? "Статья добавлена в избранное" : "Статья удалена из избранного");
+            }
         }
-
-        try {
-            String username = authentication.getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
-            boolean isAdded = articleService.toggleFavourite(user, articleId);
-            
-            response.put("success", true);
-            response.put("isAdded", isAdded);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Произошла ошибка при обновлении избранного");
-            return ResponseEntity.ok(response);
-        }
+        return "redirect:/home";
     }
 
     @GetMapping("/create/article")
     public String showCreateArticleForm(Model model, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/home";
+            return "redirect:/login";
         }
         model.addAttribute("articleDto", new ArticleDto());
         return "create-article";
@@ -87,7 +97,8 @@ public class ArticleController {
     public String createArticle(@Valid ArticleDto articleDto, 
                               BindingResult bindingResult,
                               Authentication authentication,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
         if (authentication == null || !authentication.isAuthenticated()) {
             redirectAttributes.addFlashAttribute("error", 
                 "Создавать статьи могут только авторизованные пользователи");
@@ -102,27 +113,38 @@ public class ArticleController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        articleService.createArticle(articleDto, user);
-        redirectAttributes.addFlashAttribute("success", "Статья успешно создана");
-        return "redirect:/home";
+        try {
+            articleService.createArticle(articleDto, user);
+            redirectAttributes.addFlashAttribute("success", "Статья успешно создана");
+            return "redirect:/home";
+        } catch (Exception e) {
+            model.addAttribute("error", "Произошла ошибка при создании статьи");
+            return "create-article";
+        }
     }
 
-    @GetMapping("/article/detail/{id}")
+    @GetMapping("/article/{id}")
     public String showArticleDetail(@PathVariable("id") Integer articleId,
                                   Model model,
                                   Authentication authentication) {
         Article article = articleService.getArticleById(articleId);
         model.addAttribute("article", article);
 
+        // Инициализируем мапу для статуса избранного
+        Map<String, Boolean> favouriteStatus = new HashMap<>();
+        favouriteStatus.put(articleId.toString(), false);
+
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             User user = userRepository.findByUsername(username).orElse(null);
             if (user != null) {
                 model.addAttribute("user", user);
-                model.addAttribute("favouriteArticles", user.getFavouriteArticles());
+                // Проверяем, находится ли статья в избранном у пользователя
+                favouriteStatus.put(articleId.toString(), user.getFavouriteArticles().contains(article));
             }
         }
-
+        
+        model.addAttribute("favouriteStatus", favouriteStatus);
         return "article-detail";
     }
 

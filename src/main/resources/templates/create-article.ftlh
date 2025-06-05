@@ -4,79 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создание статьи</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .container {
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .form-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
         }
-        .form-group {
-            margin-bottom: 20px;
+
+        .form-floating {
+            margin-bottom: 1rem;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        textarea {
-            height: 200px;
-            resize: vertical;
-        }
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .submit-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .submit-button:hover {
-            background-color: #0056b3;
+
+        .btn-submit {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Создание новой статьи</h2>
+<#include "header.ftlh">
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Создание новой статьи</h2>
+
         <form action="/create/article" method="post">
-            <div class="form-group">
-                <label for="title">Заголовок:</label>
-                <input type="text" id="title" name="title" value="${(articleDto.title)!''}" required>
+            <#if _csrf??>
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            </#if>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="title" name="title"
+                       value="${(articleDto.title)!''}" placeholder="Введите заголовок" required>
+                <label for="title">Заголовок</label>
                 <#if errors?? && errors.getFieldError('title')??>
-                    <div class="error-message">${errors.getFieldError('title').defaultMessage}</div>
+                    <div class="invalid-feedback d-block">
+                        ${errors.getFieldError('title').defaultMessage}
+                    </div>
                 </#if>
             </div>
 
-            <div class="form-group">
-                <label for="category">Категория:</label>
-                <input type="text" id="category" name="category" value="${(articleDto.category)!''}" required>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="category" name="category"
+                       value="${(articleDto.category)!''}" placeholder="Введите категорию" required>
+                <label for="category">Категория</label>
                 <#if errors?? && errors.getFieldError('category')??>
-                    <div class="error-message">${errors.getFieldError('category').defaultMessage}</div>
+                    <div class="invalid-feedback d-block">
+                        ${errors.getFieldError('category').defaultMessage}
+                    </div>
                 </#if>
             </div>
 
-            <div class="form-group">
-                <label for="content">Содержание:</label>
-                <textarea id="content" name="content" required>${(articleDto.content)!''}</textarea>
+            <div class="form-floating mb-4">
+                    <textarea class="form-control" id="content" name="content"
+                              style="height: 200px" placeholder="Введите содержание"
+                              required>${(articleDto.content)!''}</textarea>
+                <label for="content">Содержание</label>
                 <#if errors?? && errors.getFieldError('content')??>
-                    <div class="error-message">${errors.getFieldError('content').defaultMessage}</div>
+                    <div class="invalid-feedback d-block">
+                        ${errors.getFieldError('content').defaultMessage}
+                    </div>
                 </#if>
             </div>
 
-            <button type="submit" class="submit-button">Создать статью</button>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="/home" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-primary btn-submit">
+                    <i class="bi bi-plus-circle me-2"></i>Создать статью
+                </button>
+            </div>
         </form>
     </div>
+</div>
+<#include "footer.ftlh">
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
