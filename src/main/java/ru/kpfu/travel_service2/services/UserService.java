@@ -1,14 +1,22 @@
 package ru.kpfu.travel_service2.services;
 
+import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.ExpressionException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.kpfu.travel_service2.dto.UserRegisterDto;
+import ru.kpfu.travel_service2.dto.UpdateProfileDto;
 import ru.kpfu.travel_service2.entity.User;
 import ru.kpfu.travel_service2.repository.UserRepository;
+import ru.kpfu.travel_service2.utils.CloudinaryUtil;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -26,6 +34,8 @@ public class UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    private final Cloudinary cloudinary = CloudinaryUtil.getInstance();
 
     @Transactional
     public void saveUser(UserRegisterDto userRegisterDto) throws Exception {
@@ -78,5 +88,33 @@ public class UserService {
     public void updatePassword(User user, String newPassword) {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateProfile(User user, UpdateProfileDto updateProfileDto) {
+        user.setUsername(updateProfileDto.getUsername());
+        user.setEmail(updateProfileDto.getEmail());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateProfilePhoto(User user, MultipartFile photo) throws IOException {
+        if (photo != null && !photo.isEmpty()) {
+            String photoUrl = uploadProfilePhoto(photo);
+            user.setProfile_url(photoUrl);
+            userRepository.save(user);
+        }
+    }
+
+    private String uploadProfilePhoto(MultipartFile photo) throws IOException {
+        Map<String, Object> options = new HashMap<>();
+        options.put("folder", "profile_photos");
+        options.put("resource_type", "auto");
+
+        Map<String, Object> uploadResult = cloudinary.uploader().upload(
+            photo.getBytes(),
+            options
+        );
+        return (String) uploadResult.get("url");
     }
 }

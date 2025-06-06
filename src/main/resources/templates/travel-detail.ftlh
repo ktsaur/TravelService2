@@ -5,92 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Детали путешествия</title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
         .travel-detail {
             background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
         .travel-title {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #212529;
+            margin-bottom: 1.5rem;
         }
         .travel-info {
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
         }
         .travel-info-label {
-            font-weight: bold;
-            color: #666;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
         }
         .travel-info-value {
-            margin-top: 5px;
-            color: #333;
+            color: #212529;
+        }
+        .travel-photo {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
         }
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-        .btn-back {
-            background-color: #6c757d;
-            color: white;
-        }
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            gap: 1rem;
+            margin-top: 2rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Детали путешествия</h2>
-            <a href="/travels" class="btn btn-back">Назад к списку</a>
-        </div>
+    <#include "header.ftlh">
 
+    <div class="container py-4">
         <#if success??>
-            <div class="alert alert-success">${success}</div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${success}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </#if>
 
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Детали путешествия</h1>
+            <a href="/travels" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Назад к списку
+            </a>
+        </div>
+
         <div class="travel-detail">
-            <h1 class="travel-title">${travel.nameTravel}</h1>
+            <h2 class="travel-title">${travel.nameTravel}</h2>
+
+            <#if travel.travelUrl?? && travel.travelUrl != "">
+                <img src="${travel.travelUrl}" alt="Фото путешествия" class="travel-photo">
+            </#if>
 
             <div class="travel-info">
                 <div class="travel-info-label">Описание:</div>
@@ -124,14 +100,21 @@
             </#if>
 
             <div class="button-group">
-                <a href="/travel/update/${travel.travelId}" class="btn btn-primary">Изменить путешествие</a>
+                <a href="/travel/update/${travel.travelId}" class="btn btn-primary">
+                    <i class="bi bi-pencil me-2"></i>Изменить
+                </a>
                 <form action="/travel/delete/${travel.travelId}" method="post" style="display: inline;">
+                    <#if _csrf??>
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    </#if>
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить это путешествие?')">
-                        Удалить путешествие
+                        <i class="bi bi-trash me-2"></i>Удалить
                     </button>
                 </form>
             </div>
         </div>
     </div>
+
+    <#include "footer.ftlh">
 </body>
 </html> 

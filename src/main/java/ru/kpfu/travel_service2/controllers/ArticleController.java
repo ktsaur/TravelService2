@@ -164,4 +164,31 @@ public class ArticleController {
 
         return "favourites";
     }
+
+    @PostMapping("/article/toggle-favourite/{id}")
+    @ResponseBody
+    public Map<String, Object> toggleFavouriteAjax(@PathVariable("id") Integer articleId,
+                                                  Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            if (authentication != null && authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                User user = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                
+                boolean isAdded = articleService.toggleFavourite(user, articleId);
+                response.put("success", true);
+                response.put("isAdded", isAdded);
+            } else {
+                response.put("success", false);
+                response.put("message", "Необходимо авторизоваться");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Произошла ошибка при обновлении избранного");
+        }
+        
+        return response;
+    }
 } 

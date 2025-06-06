@@ -31,6 +31,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation ("com.cloudinary:cloudinary-core:1.32.2")
+    implementation ("com.cloudinary:cloudinary-http44:1.32.2")
     implementation("org.postgresql:postgresql:42.7.3")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

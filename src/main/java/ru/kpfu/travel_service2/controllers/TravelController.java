@@ -33,6 +33,7 @@ public class TravelController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
+        model.addAttribute("user", user);
         model.addAttribute("travels", travelService.getUserTravels(user));
         return "travels";
     }
@@ -42,6 +43,11 @@ public class TravelController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                
+        model.addAttribute("user", user);
         model.addAttribute("travelDto", new TravelDto());
         return "create-travel";
     }
@@ -86,6 +92,7 @@ public class TravelController {
             return "redirect:/travels";
         }
 
+        model.addAttribute("user", user);
         model.addAttribute("travel", travel);
         return "travel-detail";
     }
@@ -116,6 +123,7 @@ public class TravelController {
         travelDto.setListOfThings(travel.getListOfThings());
         travelDto.setNotes(travel.getNotes());
 
+        model.addAttribute("user", user);
         model.addAttribute("travelId", travelId);
         model.addAttribute("travelDto", travelDto);
         return "update-travel";

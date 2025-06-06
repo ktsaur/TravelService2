@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.kpfu.travel_service2.dto.UpdateProfileDto;
 import ru.kpfu.travel_service2.dto.ChangePasswordDto;
@@ -53,6 +53,34 @@ public class ProfileController {
         }
         
         return "profile";
+    }
+
+    @GetMapping("/profile/photo")
+    public String showUpdatePhotoForm(Model model, Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        model.addAttribute("user", user);
+        return "update-photo";
+    }
+
+    @PostMapping("/profile/photo")
+    public String updatePhoto(@RequestParam("photo") MultipartFile photo,
+                            Authentication authentication,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+            userService.updateProfilePhoto(user, photo);
+            redirectAttributes.addFlashAttribute("success", "Фотография профиля успешно обновлена");
+            return "redirect:/profile";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при загрузке фотографии");
+            return "redirect:/profile/photo";
+        }
     }
 
     @PostMapping("/profile/delete")
@@ -111,9 +139,7 @@ public class ProfileController {
         }
 
         try {
-            currentUser.setUsername(updateProfileDto.getUsername());
-            currentUser.setEmail(updateProfileDto.getEmail());
-            userRepository.save(currentUser);
+            userService.updateProfile(currentUser, updateProfileDto);
 
             UserDetails updatedUserDetails = userDetailsService.loadUserByUsername(updateProfileDto.getUsername());
             Authentication newAuth = new UsernamePasswordAuthenticationToken(

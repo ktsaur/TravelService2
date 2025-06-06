@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -29,4 +30,6 @@ public class TravelDto {
     private String listOfThings;
     
     private String notes;
+
+    private MultipartFile photo;
 } 

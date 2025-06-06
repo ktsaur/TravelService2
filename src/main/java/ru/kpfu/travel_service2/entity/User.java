@@ -33,6 +33,9 @@ public class User {
     @Column
     private Boolean activated;
 
+    @Column(name = "profile_url")
+    private String profile_url;
+
     @Enumerated(value = EnumType.STRING)
     private Role role;
 

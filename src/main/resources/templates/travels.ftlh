@@ -82,36 +82,68 @@
     </style>
 </head>
 <body>
+    <#include "header.ftlh">
+
     <div class="container">
-        <div class="header">
-            <h2>Мои путешествия</h2>
-            <div class="auth-buttons">
-                <a href="/home" class="auth-button">На главную</a>
-                <form action="/logout" method="post" style="margin: 0;">
-                    <button type="submit" class="auth-button">Выйти</button>
-                </form>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Мои путешествия</h1>
+            <a href="/create/travel" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill me-2"></i>Создать путешествие
+            </a>
         </div>
 
         <#if success??>
-            <div class="alert alert-success">${success}</div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${success}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </#if>
-
-        <a href="/create/travel" class="create-travel-button">Создать новое путешествие</a>
 
         <#if travels?? && travels?size gt 0>
-            <ul class="travel-list">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <#list travels as travel>
-                    <li class="travel-item">
-                        <a href="/travel/detail/${travel.travelId}" class="travel-link">
-                            ${travel.nameTravel}
-                        </a>
-                    </li>
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <#if travel.travelUrl?? && travel.travelUrl != "">
+                                <img src="${travel.travelUrl}" class="card-img-top" alt="Фото путешествия" style="height: 200px; object-fit: cover;">
+                            <#else>
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image text-secondary" style="font-size: 3rem;"></i>
+                                </div>
+                            </#if>
+                            <div class="card-body">
+                                <h5 class="card-title">${travel.nameTravel}</h5>
+                                <p class="card-text text-muted">
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    ${travel.startDate?string("dd.MM.yyyy")} - ${travel.endDate?string("dd.MM.yyyy")}
+                                </p>
+                                <p class="card-text">
+                                    <i class="bi bi-car-front me-2"></i>${travel.transport}
+                                </p>
+                                <#if travel.description?? && travel.description?length gt 100>
+                                    <p class="card-text">${travel.description[0..100]}...</p>
+                                <#else>
+                                    <p class="card-text">${travel.description!''}</p>
+                                </#if>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="/travel/detail/${travel.travelId}" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-eye me-2"></i>Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </#list>
-            </ul>
+            </div>
         <#else>
-            <p>У вас пока нет запланированных путешествий.</p>
+            <div class="text-center py-5">
+                <i class="bi bi-compass display-1 text-muted mb-3"></i>
+                <h3>У вас пока нет запланированных путешествий</h3>
+                <p class="text-muted">Создайте свое первое путешествие, нажав кнопку "Создать путешествие"</p>
+            </div>
         </#if>
     </div>
+
+    <#include "footer.ftlh">
 </body>
 </html> 

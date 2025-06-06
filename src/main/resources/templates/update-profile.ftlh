@@ -3,110 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Изменение профиля</title>
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .auth-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
-        }
-        .auth-button:hover {
-            background-color: #0056b3;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #666;
-        }
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .button-group {
-            margin-top: 20px;
-        }
-        .btn-save {
-            background-color: #28a745;
-        }
-        .btn-save:hover {
-            background-color: #218838;
-        }
-    </style>
+    <title>Изменение данных профиля</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Изменение профиля</h2>
-            <div class="auth-buttons">
-                <a href="/profile" class="auth-button">Назад к профилю</a>
+    <#include "header.ftlh">
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Изменение данных профиля</h2>
+
+                        <form action="/profile/update" method="post">
+                            <#if _csrf??>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </#if>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Имя пользователя</label>
+                                <input type="text" id="username" name="username" class="form-control" value="${updateProfileDto.username}" required>
+                                <#if errors?? && errors.getFieldError('username')??>
+                                    <div class="invalid-feedback d-block">${errors.getFieldError('username').defaultMessage}</div>
+                                </#if>
+                                <#if usernameError??>
+                                    <div class="invalid-feedback d-block">${usernameError}</div>
+                                </#if>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" value="${updateProfileDto.email}" required>
+                                <#if errors?? && errors.getFieldError('email')??>
+                                    <div class="invalid-feedback d-block">${errors.getFieldError('email').defaultMessage}</div>
+                                </#if>
+                                <#if emailError??>
+                                    <div class="invalid-feedback d-block">${emailError}</div>
+                                </#if>
+                            </div>
+
+                            <#if error??>
+                                <div class="alert alert-danger" role="alert">${error}</div>
+                            </#if>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/profile" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg me-2"></i>Отмена
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-2"></i>Сохранить изменения
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <form action="/profile/update" method="post">
-            <div class="form-group">
-                <label for="username">Имя пользователя:</label>
-                <input type="text" id="username" name="username" value="${updateProfileDto.username}" required>
-                <#if errors?? && errors.getFieldError('username')??>
-                    <div class="error-message">${errors.getFieldError('username').defaultMessage}</div>
-                </#if>
-                <#if usernameError??>
-                    <div class="error-message">${usernameError}</div>
-                </#if>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="${updateProfileDto.email}" required>
-                <#if errors?? && errors.getFieldError('email')??>
-                    <div class="error-message">${errors.getFieldError('email').defaultMessage}</div>
-                </#if>
-                <#if emailError??>
-                    <div class="error-message">${emailError}</div>
-                </#if>
-            </div>
-
-            <#if error??>
-                <div class="error-message" style="margin-bottom: 20px;">${error}</div>
-            </#if>
-
-            <div class="button-group">
-                <button type="submit" class="auth-button btn-save">Сохранить изменения</button>
-            </div>
-        </form>
     </div>
+
+    <#include "footer.ftlh">
 </body>
 </html> 

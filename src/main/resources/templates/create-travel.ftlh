@@ -3,55 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создание путешествия</title>
+    <title>Создание нового путешествия</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #f8f9fa;
+        }
         .container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="date"], textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        textarea {
-            height: 100px;
-            resize: vertical;
-        }
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .submit-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .submit-button:hover {
-            background-color: #0056b3;
+            margin: 2rem auto;
+            padding: 2rem;
         }
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        input[type="text"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+        }
+        textarea {
+            min-height: 100px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .submit-button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .submit-button:hover {
+            background-color: #0b5ed7;
+        }
+        .photo-preview {
+            max-width: 300px;
+            margin-top: 1rem;
+            display: none;
         }
     </style>
 </head>
@@ -61,7 +69,11 @@
             <h2>Создание нового путешествия</h2>
         </div>
 
-        <form action="/create/travel" method="post">
+        <form action="/create/travel" method="post" enctype="multipart/form-data">
+            <#if _csrf??>
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            </#if>
+
             <div class="form-group">
                 <label for="nameTravel">Название путешествия:</label>
                 <input type="text" id="nameTravel" name="nameTravel" value="${(travelDto.nameTravel)!''}" required>
@@ -112,8 +124,65 @@
                 <textarea id="notes" name="notes">${(travelDto.notes)!''}</textarea>
             </div>
 
-            <button type="submit" class="submit-button">Сохранить путешествие</button>
+            <div class="form-group">
+                <label for="photo">Фотография:</label>
+                <input type="file" id="photo" name="photo" accept="image/*" class="form-control" onchange="validateAndPreviewImage(this)">
+                <div id="photoError" class="error-message" style="display: none;"></div>
+                <img id="preview" src="#" alt="Предпросмотр" class="photo-preview">
+                <small class="text-muted">Максимальный размер файла: 10MB. Поддерживаемые форматы: JPG, PNG, GIF.</small>
+            </div>
+
+            <button type="submit" class="submit-button" id="submitButton">Сохранить путешествие</button>
         </form>
     </div>
+
+    <script>
+        function validateAndPreviewImage(input) {
+            const preview = document.getElementById('preview');
+            const errorDiv = document.getElementById('photoError');
+            const submitButton = document.getElementById('submitButton');
+            const maxSize = 10 * 1024 * 1024; // 10MB в байтах
+            
+            // Сбрасываем предыдущие ошибки
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            submitButton.disabled = false;
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Проверяем размер файла
+                if (file.size > maxSize) {
+                    errorDiv.textContent = 'Размер файла превышает 10MB';
+                    errorDiv.style.display = 'block';
+                    preview.style.display = 'none';
+                    submitButton.disabled = true;
+                    input.value = ''; // Очищаем input
+                    return;
+                }
+                
+                // Проверяем тип файла
+                if (!file.type.startsWith('image/')) {
+                    errorDiv.textContent = 'Пожалуйста, загрузите изображение';
+                    errorDiv.style.display = 'block';
+                    preview.style.display = 'none';
+                    submitButton.disabled = true;
+                    input.value = ''; // Очищаем input
+                    return;
+                }
+                
+                // Если все проверки пройдены, показываем предпросмотр
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html> 

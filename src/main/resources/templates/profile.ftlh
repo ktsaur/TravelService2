@@ -4,181 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль пользователя</title>
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .auth-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
-        }
-        .auth-button:hover {
-            background-color: #0056b3;
-        }
-        .profile-info {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .profile-field {
-            margin-bottom: 15px;
-        }
-        .profile-label {
-            font-weight: bold;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        .profile-value {
-            color: #333;
-            font-size: 16px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .delete-button {
-            background-color: #dc3545;
-        }
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 500px;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .modal-cancel {
-            background-color: #6c757d;
-        }
-        .modal-cancel:hover {
-            background-color: #5a6268;
-        }
-        .modal-delete {
-            background-color: #dc3545;
-        }
-        .modal-delete:hover {
-            background-color: #c82333;
-        }
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Профиль пользователя</h2>
-            <div class="auth-buttons">
-                <a href="/home" class="auth-button">На главную</a>
-                <a href="/travels" class="auth-button">Мои путешествия</a>
-                <form action="/logout" method="post" style="margin: 0;">
-                    <button type="submit" class="auth-button">Выйти</button>
-                </form>
-            </div>
-        </div>
+    <#include "header.ftlh">
 
-        <#if successMessage??>
-            <div class="alert alert-success">${successMessage}</div>
+    <div class="container py-4">
+        <#if success??>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${success}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </#if>
 
-        <div class="profile-info">
-            <div class="profile-field">
-                <div class="profile-label">Имя пользователя:</div>
-                <div class="profile-value">${user.username}</div>
-            </div>
-            <div class="profile-field">
-                <div class="profile-label">Email:</div>
-                <div class="profile-value">${user.email}</div>
-            </div>
-            <div class="profile-field">
-                <div class="profile-label">Пароль:</div>
-                <div class="profile-value">
-                    ********
-                    <a href="/profile/password" class="auth-button">Изменить пароль</a>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <#if user.profile_url?? && user.profile_url != "">
+                            <img src="${user.profile_url}" alt="Фото профиля" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        <#else>
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                                <i class="bi bi-person text-secondary" style="font-size: 4rem;"></i>
+                            </div>
+                        </#if>
+                        <h4 class="mb-0">${user.username}</h4>
+                        <p class="text-muted">${user.email}</p>
+                        <a href="/profile/photo" class="btn btn-outline-primary mt-3">
+                            <i class="bi bi-camera me-2"></i>Загрузить фотографию
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="button-group">
-                <a href="/profile/update" class="auth-button">Изменить данные</a>
-                <button class="auth-button delete-button" onclick="showDeleteModal()">Удалить аккаунт</button>
+            
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Информация профиля</h5>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Имя пользователя</h6>
+                            <p class="mb-0">${user.username}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Email</h6>
+                            <p class="mb-0">${user.email}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Пароль</h6>
+                            <p class="mb-2">********</p>
+                            <a href="/profile/password" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-key me-2"></i>Изменить пароль
+                            </a>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="/profile/update" class="btn btn-primary">
+                                <i class="bi bi-pencil me-2"></i>Изменить данные профиля
+                            </a>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <i class="bi bi-trash me-2"></i>Удалить аккаунт
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3>Подтверждение удаления</h3>
-            <p>Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя будет отменить.</p>
-            <div class="modal-buttons">
-                <button class="auth-button modal-cancel" onclick="hideDeleteModal()">Отмена</button>
-                <form action="/profile/delete" method="post" style="margin: 0;">
-                    <button type="submit" class="auth-button modal-delete">Удалить</button>
-                </form>
+    <!-- Modal для подтверждения удаления аккаунта -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя будет отменить.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <form action="/profile/delete" method="post" style="display: inline;">
+                        <#if _csrf??>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        </#if>
+                        <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        function showDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'block';
-        }
-
-        function hideDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('deleteModal');
-            if (event.target == modal) {
-                hideDeleteModal();
-            }
-        }
-    </script>
+    <#include "footer.ftlh">
 </body>
 </html> 
