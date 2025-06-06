@@ -51,6 +51,7 @@ public class UserService {
         user.setEmail(userRegisterDto.getEmail());
         user.setEnabled(false);
         user.setActivated(false);
+        user.setRole(User.Role.USER);
 
         String token = tokenService.generateToken();
         user.setActivationToken(token);

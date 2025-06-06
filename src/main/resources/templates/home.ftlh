@@ -63,6 +63,30 @@
         .favorite-btn:hover {
             transform: scale(1.2);
         }
+        .support-chat-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        .support-chat-btn:hover {
+            transform: scale(1.1);
+            background-color: #218838;
+            color: white;
+        }
+        .support-chat-btn i {
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -167,8 +191,12 @@
             </div>
         </#if>
 
-        <a href="/create/article" class="btn btn-primary create-article-btn">
+         <a href="/create/article" class="btn btn-primary create-article-btn">
             <i class="bi bi-plus-circle-fill me-2"></i>Создать статью
+        </a>
+        
+        <a href="/chat" class="support-chat-btn" title="Чат поддержки">
+            <i class="bi bi-chat-dots-fill"></i>
         </a>
     </div>
 
