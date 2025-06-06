@@ -12,7 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ru.kpfu.travel_service2.dto.ChatMessageDto;
 import ru.kpfu.travel_service2.dto.ChatMessageDto.MessageType;
-import ru.kpfu.travel_service2.service.ChatMessageService;
+import ru.kpfu.travel_service2.services.ChatMessageService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
