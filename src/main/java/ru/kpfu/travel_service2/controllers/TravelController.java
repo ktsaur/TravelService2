@@ -126,6 +126,7 @@ public class TravelController {
         model.addAttribute("user", user);
         model.addAttribute("travelId", travelId);
         model.addAttribute("travelDto", travelDto);
+        model.addAttribute("travel", travel);
         return "update-travel";
     }
 

@@ -23,10 +23,11 @@ public class SecurityConfig {
             .securityMatcher("/api/**")
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/api/v1/travels/**").authenticated()
+                .anyRequest().permitAll()
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             );
         
         return http.build();

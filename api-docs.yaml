@@ -1,0 +1,175 @@
+openapi: 3.0.1
+info:
+  title: Travel Service API
+  description: REST API для сервиса путешествий
+  version: "1.0"
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Путешествия
+  description: API для работы с путешествиями
+paths:
+  /article/toggle-favourite/{id}:
+    post:
+      tags:
+      - article-controller
+      operationId: toggleFavouriteAjax
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/v1/travels:
+    get:
+      tags:
+      - Путешествия
+      summary: Получить список всех путешествий текущего пользователя
+      description: "Возвращает список всех путешествий, принадлежащих текущему аут\
+        ентифицированному пользователю"
+      operationId: getAllTravels
+      responses:
+        "401":
+          description: Пользователь не аутентифицирован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: Список путешествий успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TravelDto"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/travels/{id}:
+    get:
+      tags:
+      - Путешествия
+      summary: Получить путешествие по ID
+      description: Возвращает информацию о конкретном путешествии по его идентификатору
+      operationId: getTravelById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "401":
+          description: Пользователь не аутентифицирован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Путешествие не найдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Доступ запрещен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: Путешествие успешно найдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TravelDto"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP статус ошибки
+          format: int32
+          example: 404
+        message:
+          type: string
+          description: Сообщение об ошибке
+          example: Путешествие не найдено
+        timestamp:
+          type: string
+          description: Временная метка возникновения ошибки
+          example: 2024-03-20T10:15:30.123Z
+      description: Ответ с информацией об ошибке
+    TravelDto:
+      required:
+      - description
+      - endDate
+      - nameTravel
+      - startDate
+      type: object
+      properties:
+        travelId:
+          type: integer
+          description: Идентификатор путешествия
+          format: int32
+          example: 1
+        nameTravel:
+          type: string
+          description: Название путешествия
+          example: Путешествие в Париж
+        description:
+          type: string
+          description: Описание путешествия
+          example: Незабываемое путешествие в столицу Франции
+        startDate:
+          type: string
+          description: Дата начала путешествия
+          format: date-time
+        endDate:
+          type: string
+          description: Дата окончания путешествия
+          format: date-time
+        transport:
+          type: string
+          description: Транспорт
+          example: Самолет
+        listOfThings:
+          type: string
+          description: Список вещей
+          example: "Паспорт, билеты, одежда"
+        notes:
+          type: string
+          description: Заметки
+          example: Не забыть посетить Эйфелеву башню
+        travelUrl:
+          type: string
+          description: URL фотографии путешествия
+          example: https://example.com/paris.jpg
+        photo:
+          type: string
+          format: binary
+        over:
+          type: boolean
+      description: Информация о путешествии

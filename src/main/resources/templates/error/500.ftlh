@@ -36,7 +36,7 @@
             <div class="error-code">500</div>
             <div class="error-message">Внутренняя ошибка сервера</div>
             <p class="mb-4">Произошла непредвиденная ошибка. Пожалуйста, попробуйте позже или обратитесь в службу поддержки.</p>
-            <a href="/" class="btn btn-primary">Вернуться на главную</a>
+            <a href="/home" class="btn btn-primary">Вернуться на главную</a>
         </div>
     </div>
 </body>
